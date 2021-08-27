@@ -1,0 +1,49 @@
+---
+- name: install web-server Apache
+  hosts: node
+  become: true
+  vars:
+    project_root: /var/www/html
+  tasks:
+    - name: install httpd
+      ansible.builtin.yum:
+        name: httpd
+        state: present
+      when:
+        - ansible_distribution == "CentOS"
+
+    - name: copy index.html
+      ansible.builtin.copy:
+        src: index.html.j2
+        dest: "{{ project_root }}/index.html"
+        owner: apache
+        group: apache
+        mode: 0644
+      notify: reload httpd
+
+    - name: Enable service to start
+      ansible.builtin.service:
+        name: httpd
+        enabled: yes
+      notify: reload httpd  
+
+    - name: reload service firewalld
+      systemd:
+        name: firewalld
+        state: reloaded
+
+    - name : Configure firewall to allow http/https
+      firewalld:
+        service: "{{ item }}"
+        permanent: yes
+        immediate: yes
+        state: enabled
+      loop:
+        - http
+        - https
+
+  handlers:
+    - name: reload httpd
+      service:
+        name: httpd
+        state: restarted

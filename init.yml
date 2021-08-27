@@ -1,0 +1,24 @@
+---
+- name: initial srv
+  hosts: node
+  become: true
+  vars:
+    user_name: ansible
+  tasks:
+    - name: Creating user {{ user_name }} without admin access
+      ansible.builtin.user:
+        name: "{{ user_name }}"
+        password: "{{ user_pass | password_hash('sha512') }}"
+
+    - name: Create sudoers file for user
+      ansible.builtin.copy:
+        dest: "/etc/sudoers.d/{{ user_name }}"
+        content: "{{ user_name }} ALL=(ALL) NOPASSWD:ALL "
+        mode: 0440
+
+    - name: Set authorized key token from file
+      ansible.builtin.authorized_key:
+        user: "{{ user_name }}"
+        state: present
+        key: "{{ lookup('file', '/home/ansible/.ssh/id_ecdsa.pub') }}"
+

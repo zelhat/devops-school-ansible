@@ -1,0 +1,23 @@
+---
+- name: remove httpd
+  hosts: node
+  become: true
+  tasks:
+    - name: uninstall httpd
+      ansible.builtin.yum:
+        name: httpd
+        state: absent
+
+    - name: firewalld disable http/https
+      firewalld:
+        service: "{{ item }}"
+        permanent: yes
+        state: disabled
+      loop:
+        - http
+        - https
+
+    - name: Remove file (delete file) index.html
+      ansible.builtin.file:
+        path: /var/www/html/index.html
+        state: absent
