@@ -1,3 +1,7 @@
 [node]
 node1.example.com
 node2.example.com
+
+[test]
+node1 ansible_host=192.168.56.101
+node2 ansible_host=192.168.56.102
