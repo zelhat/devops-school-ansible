@@ -28,11 +28,6 @@
         enabled: yes
       notify: reload httpd
 
-    # - name: reload service firewalld
-    #   systemd:
-    #     name: firewalld
-    #     state: reloaded
-
     - name : Configure firewall to allow http/https
       firewalld:
         service: "{{ item }}"
