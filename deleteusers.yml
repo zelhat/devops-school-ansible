@@ -1,0 +1,13 @@
+---
+- hosts: node
+  gather_facts: false
+  tasks:
+    - ansible.builtin.user:
+        name: "{{ item }}"
+        state: absent
+        remove: yes
+      become: yes
+      with_items:
+        - Alice
+        - Bob
+        - Carol
