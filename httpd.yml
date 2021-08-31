@@ -9,6 +9,7 @@
       ansible.builtin.yum:
         name: httpd
         state: present
+      notify: reload httpd
       when:
         - ansible_distribution == "CentOS"
 
@@ -25,19 +26,19 @@
       ansible.builtin.service:
         name: httpd
         enabled: yes
-      notify: reload httpd  
+      notify: reload httpd
 
-    - name: reload service firewalld
-      systemd:
-        name: firewalld
-        state: reloaded
+    # - name: reload service firewalld
+    #   systemd:
+    #     name: firewalld
+    #     state: reloaded
 
     - name : Configure firewall to allow http/https
       firewalld:
         service: "{{ item }}"
         permanent: yes
-        immediate: yes
         state: enabled
+      notify: reload firewalld
       loop:
         - http
         - https
@@ -46,4 +47,9 @@
     - name: reload httpd
       service:
         name: httpd
+        state: restarted
+
+    - name: reload firewalld
+      service:
+        name: firewalld
         state: restarted
