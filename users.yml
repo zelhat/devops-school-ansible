@@ -15,5 +15,6 @@
         password: "{{ item.pass | string | password_hash('sha512') }}"
         update_password: on_create
       become: yes
+      no_log: true
       with_items:
         - "{{ newusers }}"
