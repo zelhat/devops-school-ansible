@@ -1,26 +1,21 @@
 ---
 - name: change grub
   hosts: node
+  gather_facts: false
   become: true
   tasks:
   - name: change /etc/default/grub
     ansible.builtin.lineinfile:
       path: /etc/default/grub
-      regexp: '^(GRUB_CMDLINE_LINUX=(?!.*net\.ifnames)\"[^\"]+)(\".*)'
-      line: '\1 net.ifnames=0\2'
+      regexp: '^(GRUB_CMDLINE_LINUX=(?!.*{{ item.key }})\"[^\"]+)(\".*)'
+      line: '\1 {{ item.key }}={{ item.val }}\2'
       state: present
       backrefs: yes
+    loop:
+      - { key: 'net.ifnames', val: '0' }
+      - { key: 'biosdevname', val: '0' }
     notify: Write grub configuration file
   
-  - name: change /etc/default/grub
-    ansible.builtin.lineinfile:
-      path: /etc/default/grub
-      regexp: '^(GRUB_CMDLINE_LINUX=(?!.*biosdevname)\"[^\"]+)(\".*)'
-      line: '\1 biosdevname=0\2'
-      state: present
-      backrefs: yes
-    notify: Write grub configuration file
-
   handlers:
   - name: Write grub configuration file
     command: grub2-mkconfig -o /boot/grub2/grub.cfg
