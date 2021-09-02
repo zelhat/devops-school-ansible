@@ -8,7 +8,7 @@ yum install -y ansible git
 
 useradd ansible
 
-echo <super-password> | sudo passwd --stdin ansible
+echo super__password | sudo passwd --stdin ansible
 
 echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
 
@@ -20,4 +20,4 @@ git clone https://github.com/zelhat/devops-school-ansible.git
 
 cd devops-school-ansible
 
-ansible-playbook init.yml --ask-pass -e user_pass=<super-password> -u <user>
+ansible-playbook init.yml --ask-pass -e user_pass=super__password -u user__name

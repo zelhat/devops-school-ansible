@@ -1,7 +1,7 @@
 ---
-- name: remove httpd
-  hosts: node
+- hosts: node
   become: true
+  gather_facts: false
   tasks:
     - name: uninstall httpd
       ansible.builtin.yum:
@@ -13,6 +13,7 @@
         service: "{{ item }}"
         permanent: yes
         state: disabled
+      notify: reload firewalld
       loop:
         - http
         - https
@@ -21,3 +22,9 @@
       ansible.builtin.file:
         path: /var/www/html/index.html
         state: absent
+
+  handlers:
+    - name: reload firewalld
+      service:
+        name: firewalld
+        state: restarted
