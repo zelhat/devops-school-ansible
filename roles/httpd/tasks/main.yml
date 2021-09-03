@@ -1,0 +1,34 @@
+---
+# tasks file for roles/httpd
+- name: install httpd
+  ansible.builtin.yum:
+    name: httpd
+    state: present
+  notify: reload httpd
+  when:
+    - ansible_distribution == "{{ os }}"
+
+- name: copy index.html
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ project_root }}/index.html"
+    owner: apache
+    group: apache
+    mode: 0644
+  notify: reload httpd
+
+- name: Enable service to start
+  ansible.builtin.service:
+    name: httpd
+    enabled: yes
+  notify: reload httpd
+
+- name : Configure firewall to allow http/https
+  firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    state: enabled
+  notify: reload firewalld
+  loop:
+    - http
+    - https
