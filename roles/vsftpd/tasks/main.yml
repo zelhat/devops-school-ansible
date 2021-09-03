@@ -1,0 +1,52 @@
+---
+# tasks file for vsftpd
+- name: install vsftpd
+  ansible.builtin.yum:
+    name: vsftpd
+    state: present
+  notify: reload vsftpd
+  when:
+    - ansible_distribution == "{{ os }}"
+
+- name: copy vsftpd.conf
+  ansible.builtin.template:
+    src: vsftpd.conf.j2
+    dest: "{{ project_root }}/vsftpd.conf"
+    owner: root
+    group: root
+    mode: 0600
+  notify: reload vsftpd
+
+- name: Enable service to start
+  ansible.builtin.service:
+    name: vsftpd
+    enabled: yes
+  notify: reload vsftpd
+
+- name: changed permission
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: ftp
+    group: ftp
+    mode: "0755"
+  notify: reload vsftpd
+  loop:
+    - { path: '/var/ftp/pub' }
+    - { path: '/var/ftp/pub/upload' }
+
+- name: setsebool
+  seboolean:
+    name: allow_ftpd_anon_write
+    state: yes
+    persistent: yes
+
+- name: Run command chcon
+  ansible.builtin.command: chcon -t public_content_rw_t /var/www/pub/upload
+
+- name : Configure firewall to allow ftp
+  firewalld:
+    service: "ftp"
+    permanent: yes
+    state: enabled
+  notify: reload firewalld

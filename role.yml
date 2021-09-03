@@ -1,0 +1,8 @@
+---
+- hosts: node
+  become: true
+  vars:
+    os: "CentOS"
+  roles:
+    - role: httpd
+    - role: vsftpd

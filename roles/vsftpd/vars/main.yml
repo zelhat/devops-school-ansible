@@ -1,0 +1,8 @@
+---
+# vars file for vsftpd
+project_root: /etc/vsftpd
+
+anonymous_enable: "YES"
+anon_upload_enable: "YES"
+listen: "NO"
+listen_ipv6: "YES"
