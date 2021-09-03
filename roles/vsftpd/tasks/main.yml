@@ -27,13 +27,20 @@
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: directory
-    owner: ftp
-    group: ftp
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
     mode: "0755"
   notify: reload vsftpd
   loop:
-    - { path: '/var/ftp/pub' }
-    - { path: '/var/ftp/pub/upload' }
+    - { path: '/var/ftp/pub', name: 'nobody' }
+    - { path: '/var/ftp/pub/upload', name: 'ftp' }
+
+- name: install semanage 'python3-libsemanage'
+  ansible.builtin.yum:
+    name: python3-libsemanage
+    state: present
+  when:
+    - ansible_distribution == "{{ os }}"
 
 - name: setsebool
   seboolean:
@@ -42,9 +49,9 @@
     persistent: yes
 
 - name: Run command chcon
-  ansible.builtin.command: chcon -t public_content_rw_t /var/www/pub/upload
+  ansible.builtin.command: chcon -t public_content_rw_t /var/ftp/pub/upload
 
-- name : Configure firewall to allow ftp
+- name: Configure firewall to allow ftp
   firewalld:
     service: "ftp"
     permanent: yes
