@@ -20,4 +20,4 @@
       ansible.builtin.authorized_key:
         user: "{{ user_name }}"
         state: present
-        key: "{{ lookup('file', '/home/ansible/.ssh/id_ecdsa.pub') }}"
+        key: "{{ key_pub') }}"
