@@ -20,4 +20,4 @@
       ansible.builtin.authorized_key:
         user: "{{ user_name }}"
         state: present
-        key: https://github.com/zelhat/devops-school-ansible/blob/dev/key.pub
+        key: https://raw.githubusercontent.com/zelhat/devops-school-ansible/dev/key.pub
